@@ -4,7 +4,9 @@
 let accessToken = null;
 let refreshTokenValue = null;
 
-const BASE_URL = "http://localhost:5000";
+/* IMPORTANT FIX:
+   Use empty BASE_URL so it works on Render + locally */
+const BASE_URL = "";
 
 /* =========================
    Tab Switching
