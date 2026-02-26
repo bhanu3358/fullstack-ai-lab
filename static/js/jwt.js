@@ -9,6 +9,21 @@ let refreshTokenValue = null;
 const BASE_URL = "";
 
 /* =========================
+   Safe JSON Parser
+   (Fix for: Unexpected token '<')
+========================= */
+async function safeJson(response) {
+  const contentType = response.headers.get("content-type");
+
+  if (contentType && contentType.includes("application/json")) {
+    return await response.json();
+  } else {
+    const text = await response.text();
+    throw new Error(text || "Server returned HTML instead of JSON");
+  }
+}
+
+/* =========================
    Tab Switching
 ========================= */
 function showTab(tab) {
@@ -70,7 +85,7 @@ document.getElementById("signupForm").addEventListener("submit", async (e) => {
       body: JSON.stringify({ email, password }),
     });
 
-    const data = await response.json();
+    const data = await safeJson(response);
 
     if (response.ok) {
       showMessage("Registration successful! Please login.", "success");
@@ -100,7 +115,7 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
       body: JSON.stringify({ email, password }),
     });
 
-    const data = await response.json();
+    const data = await safeJson(response);
 
     if (response.ok) {
       accessToken = data.access_token;
@@ -137,7 +152,7 @@ async function testProtectedRoute() {
       },
     });
 
-    const data = await response.json();
+    const data = await safeJson(response);
 
     const responseArea = document.getElementById("responseArea");
     responseArea.style.display = "block";
@@ -168,7 +183,7 @@ async function refreshToken() {
       },
     });
 
-    const data = await response.json();
+    const data = await safeJson(response);
 
     if (response.ok) {
       accessToken = data.access_token;
